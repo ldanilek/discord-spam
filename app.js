@@ -40,7 +40,7 @@ async function onUpdate(query, args, onUpdate) {
   return cleanup();
 }
 
-const cleanup = onUpdate("getSomething", [], (value) => console.log(value));
+const cleanup = onUpdate("guess", [], (value) => console.log(value));
 
 //nonReactiveQuery('getSomething');
 
