@@ -18,8 +18,44 @@ import {
   HasGuildCommands,
 } from "./commands.js";
 //import react from "convex";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
-console.log(ConvexReactClient);
+import { InternalConvexClient } from "convex/browser";
+console.log(InternalConvexClient);
+
+const url = "https://aware-spoonbill-23.convex.cloud";
+
+import ws from "ws";
+console.log(ws);
+
+function onTransition(updatedQueries) {
+  for (const queryToken of updatedQueries) {
+    // something goes here
+  }
+  /// (updatedQueries: string[]) => void 
+  console.log('got update!');
+}
+
+const client = new InternalConvexClient({address: url}, onTransition, {
+  webSocketConstructor: ws,
+  unsavedChangesWarning: false
+});
+
+// now i need to actually write queries & mutations :P
+client.subscribe("");
+
+// we need React installed too, unless we use the convex/browser internal client
+// oh cool. does convex/browser have websockets? yep
+// thanks! weird error message. hey it worked! thanks!
+// now we need to install ws
+// ran npm install ws (shouldn't this be a dependency of convex package?)
+// normally we use the browser building WebSocket, but if we're running in node we need an impl
+// aha it's a node thingy. we should write a node tutorial at some point +1!
+// woo it worked. what was wrong?
+
+// we need better error messages, now it's really time for our JavaScript focus
+// I forgot a positional arg -- ugh
+
+// we keep putting off supporting the alternate use case but they're important
+// it
 
 // Create an express app
 const app = express();
@@ -31,7 +67,7 @@ app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
 // Store for in-progress games. In production, you'd want to use a DB
 const activeGames = {};
 
-const url = "aware-spoonbill-23";
+
 
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
