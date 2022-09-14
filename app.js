@@ -18,23 +18,15 @@ import {
   HasGuildCommands,
 } from "./commands.js";
 //import react from "convex";
-import { InternalConvexClient } from "convex/browser";
-console.log(InternalConvexClient);
+import { ConvexReactClient } from "convex/react";
 
 const url = "https://aware-spoonbill-23.convex.cloud";
 
 import ws from "ws";
 console.log(ws);
 
-function onTransition(updatedQueries) {
-  for (const queryToken of updatedQueries) {
-    // something goes here
-  }
-  /// (updatedQueries: string[]) => void 
-  console.log('got update!');
-}
 
-const client = new InternalConvexClient({address: url}, onTransition, {
+const client = new ConvexReactClient({address: url}, {
   webSocketConstructor: ws,
   unsavedChangesWarning: false
 });
