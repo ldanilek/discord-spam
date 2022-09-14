@@ -32,7 +32,17 @@ const client = new ConvexReactClient({address: url}, {
 });
 
 // now i need to actually write queries & mutations :P
-client.subscribe("");
+//client.subscribe("");
+
+async function onUpdate(query, args, onUpdate) {
+  const watch = client.watchQuery(query, ...args);
+  const cleanup = watch.onUpdate(() => onUpdate(watch.localQueryResult()));
+  return cleanup();
+}
+
+const cleanup = onUpdate("getSomething", [], (value) => console.log(value));
+
+//nonReactiveQuery('getSomething');
 
 // we need React installed too, unless we use the convex/browser internal client
 // oh cool. does convex/browser have websockets? yep
