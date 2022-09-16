@@ -59,9 +59,9 @@ function createCommandChoices() {
 }
 
 // Simple test command
-export const TEST_COMMAND = {
-  name: 'test',
-  description: 'Basic guild command',
+export const NEW_GUESSING_GAME_COMMAND = {
+  name: 'new_guessing_game',
+  description: 'Start a new guessing game',
   type: 1,
 };
 

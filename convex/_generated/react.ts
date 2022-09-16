@@ -9,6 +9,7 @@
  * @module
  */
 
+import type clear from "../clear";
 import type getWinner from "../getWinner";
 import type guess from "../guess";
 import type { OptimisticLocalStore as GenericOptimisticLocalStore } from "convex/browser";
@@ -28,6 +29,7 @@ export type ConvexAPI = {
     getWinner: ClientQuery<typeof getWinner>;
   };
   mutations: {
+    clear: ClientMutation<typeof clear>;
     guess: ClientMutation<typeof guess>;
   };
 };

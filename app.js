@@ -14,7 +14,7 @@ import {
 import { getShuffledOptions, getResult } from "./game.js";
 import {
   CHALLENGE_COMMAND,
-  TEST_COMMAND,
+  NEW_GUESSING_GAME_COMMAND,
   GUESS_COMMAND,
   HasGuildCommands,
 } from "./commands.js";
@@ -98,6 +98,7 @@ const cleanup = onUpdate("getWinner", [], (value) => {
   });
  
 const guessMutation = client.mutation("guess");
+const clearMutation = client.mutation("clear");
 
 //nonReactiveQuery('getSomething');
 
@@ -127,17 +128,18 @@ app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
 const activeGames = {};
 
 const notifyWinner = async (winner) => {
-  const [winnerUser, messageTokens] = winner;
+  const [winnerUser, messageTokens, tokenToGuess] = winner;
   if (!winnerUser) {
     return;
   }
+  const winnerMsg = `<@${winnerUser}> is winning`;
   for (let messageToken of messageTokens) {
     const endpoint = `webhooks/${process.env.APP_ID}/${messageToken}/messages/@original`;
     try {
       await DiscordRequest(endpoint, {
             method: "PATCH",
             body: {
-              content: "Nice choice " + getRandomEmoji(),
+              content: winnerMsg,
               components: [],
             },
           });
@@ -170,13 +172,13 @@ app.post("/interactions", async function (req, res) {
     const { name } = data;
 
     // "test" guild command
-    if (name === "test") {
+    if (name === "new_guessing_game") {
       // Send a message into the channel where command was triggered from
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           // Fetches a random emoji to send from a helper function
-          content: "hello world " + getRandomEmoji(),
+          content: "Started a new guessing game. Whoever /guess's closest to 50% of the average guess will win!",
         },
       });
     }
@@ -189,11 +191,15 @@ app.post("/interactions", async function (req, res) {
       const toReturn = await res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-          content: `You have guessed ${guessedNumber}. ${winnerMsg}`,
+          content: `You have guessed ${guessedNumber}`,
         },
       });
       
       return toReturn;
+    }
+    
+    if (name === "new_guessing_game") {
+      
     }
 
     // "challenge" guild command
@@ -314,8 +320,7 @@ app.listen(PORT, () => {
 
   // Check if guild commands from commands.json are installed (if not, install them)
   HasGuildCommands(process.env.APP_ID, process.env.GUILD_ID, [
-    TEST_COMMAND,
+    NEW_GUESSING_GAME_COMMAND,
     GUESS_COMMAND,
-    CHALLENGE_COMMAND,
   ]);
 });
