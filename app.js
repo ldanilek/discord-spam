@@ -31,6 +31,7 @@ const client = new ConvexReactClient({address: url}, {
   webSocketConstructor: ws,
   unsavedChangesWarning: false
 });
+
 const internalClient = new InternalConvexClient(
       client.clientConfig,
       updatedQueries => {
@@ -59,7 +60,8 @@ setTimeout(() => {
   console.log(internalClient.connectionCount);
   //internalClient.remoteQuerySet["transition"] = null;
   console.log(internalClient.remoteQuerySet.transition);
-  console.log(internalClient.)
+  const { modification, queryToken, unsubscribe } = internalClient.state.subscribe("getWinner", []);
+  internalClient.webSocketManager.sendMessage(modification);
 }, 1000);
 
 // now i need to actually write queries & mutations :P
@@ -72,9 +74,12 @@ function onUpdate(query, args, cb) {
   return cleanup();
 }
 
-const cleanup = onUpdate("getWinnerz", [], (value) => {
-  console.log(value);
-});
+setTimeout(() => {
+  const cleanup = onUpdate("getWinner", [], (value) => {
+    console.log('got a Result!');
+    console.log(value);
+  });
+}, 1000);
 
 const guessMutation = client.mutation("guess");
 
