@@ -133,6 +133,7 @@ const notifyWinner = async (winner) => {
   }
   for (let messageToken of messageTokens) {
     const endpoint = `webhooks/${process.env.APP_ID}/${messageToken}/messages/@original`;
+    try {
       await DiscordRequest(endpoint, {
             method: "PATCH",
             body: {
@@ -140,6 +141,9 @@ const notifyWinner = async (winner) => {
               components: [],
             },
           });
+    } catch (e) {
+      console.log(e);
+    }
   }
   
 };
@@ -180,7 +184,7 @@ app.post("/interactions", async function (req, res) {
     if (name === "guess") {
       const userId = req.body.member.user.id;
       const guessedNumber = req.body.data.options[0].value;
-      await guessMutation(guessedNumber, userId, id);
+      await guessMutation(guessedNumber, userId, req.body.token);
       const winnerMsg = `<@${userId}> is winning`;
       const toReturn = await res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -188,7 +192,7 @@ app.post("/interactions", async function (req, res) {
           content: `You have guessed ${guessedNumber}. ${winnerMsg}`,
         },
       });
-      console.log(toReturn.req.body.token);
+      
       return toReturn;
     }
 
