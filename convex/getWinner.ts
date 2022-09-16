@@ -11,10 +11,10 @@ export default query(async ({ db }): Promise<[string | null, string[]]> => {
   let target = avg * 0.5;
   let closestDist = 100;
   let closestGuesser = null;
-  let messageIds = [];
+  let messageTokens = [];
   for (let guess of guesses) {
-    if (guess.messageId) {
-      messageIds.push(guess.messageId);
+    if (guess.messageToken) {
+      messageTokens.push(guess.messageToken);
     }
     
     const dist = Math.abs(guess.guess - avg);
@@ -23,5 +23,5 @@ export default query(async ({ db }): Promise<[string | null, string[]]> => {
       closestGuesser = guess.guesser;
     }
   }
-  return [closestGuesser, messageIds];
+  return [closestGuesser, messageTokens];
 });

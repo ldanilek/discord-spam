@@ -94,6 +94,7 @@ setTimeout(() => {
 const cleanup = onUpdate("getWinner", [], (value) => {
     console.log('got a Result!');
     console.log(value);
+  notifyWinner(value);
   });
  
 const guessMutation = client.mutation("guess");
@@ -126,14 +127,21 @@ app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
 const activeGames = {};
 
 const notifyWinner = async (winner) => {
-  const endpoint = `webhooks/${process.env.APP_ID}/${req.body.token}/messages/${req.body.message.id}`;
-  await DiscordRequest(endpoint, {
+  const [winnerUser, messageTokens] = winner;
+  if (!winnerUser) {
+    return;
+  }
+  for (let messageToken of messageTokens) {
+    const endpoint = `webhooks/${process.env.APP_ID}/${messageToken}/messages/@original`;
+      await DiscordRequest(endpoint, {
             method: "PATCH",
             body: {
               content: "Nice choice " + getRandomEmoji(),
               components: [],
             },
           });
+  }
+  
 };
 
 /**
@@ -174,12 +182,14 @@ app.post("/interactions", async function (req, res) {
       const guessedNumber = req.body.data.options[0].value;
       await guessMutation(guessedNumber, userId, id);
       const winnerMsg = `<@${userId}> is winning`;
-      return res.send({
+      const toReturn = await res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           content: `You have guessed ${guessedNumber}. ${winnerMsg}`,
         },
       });
+      console.log(toReturn.req.body.token);
+      return toReturn;
     }
 
     // "challenge" guild command
