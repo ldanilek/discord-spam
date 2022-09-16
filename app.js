@@ -31,12 +31,22 @@ const client = new ConvexReactClient({address: url}, {
   webSocketConstructor: ws,
   unsavedChangesWarning: false
 });
-
+/*
 const internalClient = new InternalConvexClient(
       client.clientConfig,
       updatedQueries => {
         console.log('updated queries');
         console.log(updatedQueries);
+        console.log(client.listeners);
+        for (const queryToken of updatedQueries) {
+          const callbacks = client.listeners.get(queryToken);
+          if (callbacks) {
+            for (const callback of callbacks) {
+              console.log("callback called");
+              callback();
+            }
+          }
+        }
       },
       client.options
     );
@@ -50,8 +60,8 @@ internalClient.webSocketManager["onOpen"] = () => {
   console.log(internalClient.connectionCount);
   const existingTransition = internalClient.remoteQuerySet.transition.bind(internalClient.remoteQuerySet);
   internalClient.remoteQuerySet["transition"] = (t) => {
+    console.log(`transition: `, t);
     existingTransition(t);
-    console.log(t);
   };
 };
 
@@ -63,15 +73,15 @@ setTimeout(() => {
   const { modification, queryToken, unsubscribe } = internalClient.state.subscribe("getWinner", []);
   internalClient.webSocketManager.sendMessage(modification);
 }, 1000);
-
+*/
 // now i need to actually write queries & mutations :P
 //client.subscribe("");
 
 function onUpdate(query, args, cb) {
   const watch = client.watchQuery(query, ...args);
   const cleanup = watch.onUpdate(() => cb(watch.localQueryResult()));
-  console.log(`started watching query ${query}`);
-  return cleanup();
+  console.log(`started watching query ${query}`, client.listeners); 
+  return cleanup; 
 }
 
 setTimeout(() => {
@@ -79,7 +89,7 @@ setTimeout(() => {
     console.log('got a Result!');
     console.log(value);
   });
-}, 1000);
+}, 500);
 
 const guessMutation = client.mutation("guess");
 
