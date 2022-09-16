@@ -20,6 +20,7 @@ import {
 } from "./commands.js";
 //import react from "convex";
 import { ConvexReactClient } from "convex/react";
+import { InternalConvexClient } from "convex/browser";
 
 const url = "https://aware-spoonbill-23.convex.cloud";
 
@@ -35,6 +36,15 @@ const client = new ConvexReactClient({address: url}, {
 //client.subscribe("");
 
 function onUpdate(query, args, cb) {
+  client.cachedSync = new InternalConvexClient(
+      client.clientConfig,
+      updatedQueries => {
+        console.log('updated queries');
+        console.log(updatedQueries);
+      },
+      client.options
+    );
+  
   const watch = client.watchQuery(query, ...args);
   const cleanup = watch.onUpdate(() => cb(watch.localQueryResult()));
   console.log(`started watching query ${query}`);
