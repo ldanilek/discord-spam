@@ -75,7 +75,7 @@ export const GUESS_COMMAND = {
       description: 'Guess a number between 0 and 100',
     }
   ]
-}
+};
 
 // Command containing options
 export const CHALLENGE_COMMAND = {

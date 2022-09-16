@@ -15,6 +15,7 @@ import { getShuffledOptions, getResult } from "./game.js";
 import {
   CHALLENGE_COMMAND,
   TEST_COMMAND,
+  GUESS_COMMAND,
   HasGuildCommands,
 } from "./commands.js";
 //import react from "convex";
@@ -40,7 +41,9 @@ async function onUpdate(query, args, onUpdate) {
   return cleanup();
 }
 
-const cleanup = onUpdate("guess", [], (value) => console.log(value));
+const cleanup = onUpdate("getWinner", [], (value) => console.log(value));
+
+const guessMutation = client.mutation("guess");
 
 //nonReactiveQuery('getSomething');
 
@@ -102,6 +105,19 @@ app.post("/interactions", async function (req, res) {
           content: "hello world " + getRandomEmoji(),
         },
       });
+    }
+    
+    if (name === "guess") {
+      const userId = req.body.member.user.id;
+      const guessedNumber = req.body.data.options[0].value;
+      await guessMutation(guessedNumber, userId);
+      const winnerMsg = `<@{userId}> is winning`;
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: `You have guessed ${guessedNumber}. <@${}`,
+        }
+      })
     }
 
     // "challenge" guild command
@@ -223,6 +239,7 @@ app.listen(PORT, () => {
   // Check if guild commands from commands.json are installed (if not, install them)
   HasGuildCommands(process.env.APP_ID, process.env.GUILD_ID, [
     TEST_COMMAND,
+    GUESS_COMMAND,
     CHALLENGE_COMMAND,
   ]);
 });
