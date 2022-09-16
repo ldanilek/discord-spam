@@ -26,11 +26,13 @@ const url = "https://aware-spoonbill-23.convex.cloud";
 
 import ws from "ws";
 
-
-const client = new ConvexReactClient({address: url}, {
-  webSocketConstructor: ws,
-  unsavedChangesWarning: false
-});
+const client = new ConvexReactClient(
+  { address: url },
+  {
+    webSocketConstructor: ws,
+    unsavedChangesWarning: false,
+  }
+);
 /*
 const internalClient = new InternalConvexClient(
       client.clientConfig,
@@ -80,7 +82,7 @@ setTimeout(() => {
 function onUpdate(query, args, cb) {
   const watch = client.watchQuery(query, ...args);
   const cleanup = watch.onUpdate(() => cb(watch.localQueryResult()));
-  // console.log(`started watching query ${query}`, client.listeners); 
+  // console.log(`started watching query ${query}`, client.listeners);
   return cleanup;
 }
 /*
@@ -92,11 +94,11 @@ setTimeout(() => {
 }, 500);
 */
 const cleanup = onUpdate("getWinner", [], (value) => {
-    console.log('got a Result!');
-    console.log(value);
+  console.log("got a Result!");
+  console.log(value);
   notifyWinner(value);
-  });
- 
+});
+
 const guessMutation = client.mutation("guess");
 const clearMutation = client.mutation("clear");
 
@@ -135,19 +137,19 @@ const notifyWinner = async (winner) => {
   const winnerMsg = `<@${winnerUser}> is winning`;
   for (let messageToken of messageTokens) {
     const endpoint = `webhooks/${process.env.APP_ID}/${messageToken}/messages/@original`;
+    const [guesser, guess] = tokenToGuess.get(messageToken);
     try {
       await DiscordRequest(endpoint, {
-            method: "PATCH",
-            body: {
-              content: winnerMsg,
-              components: [],
-            },
-          });
+        method: "PATCH",
+        body: {
+          content: `<@${guesser}> guessed ${guess}. ${winnerMsg}`,
+          components: [],
+        },
+      });
     } catch (e) {
       console.log(e);
     }
   }
-  
 };
 
 /**
@@ -174,32 +176,32 @@ app.post("/interactions", async function (req, res) {
     // "test" guild command
     if (name === "new_guessing_game") {
       // Send a message into the channel where command was triggered from
+      await clearMutation();
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           // Fetches a random emoji to send from a helper function
-          content: "Started a new guessing game. Whoever /guess's closest to 50% of the average guess will win!",
+          content:
+            "Started a new guessing game. Whoever /guess's closest to 50% of the average guess will win!",
         },
       });
     }
-    
+
     if (name === "guess") {
       const userId = req.body.member.user.id;
       const guessedNumber = req.body.data.options[0].value;
       await guessMutation(guessedNumber, userId, req.body.token);
-      const winnerMsg = `<@${userId}> is winning`;
       const toReturn = await res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-          content: `You have guessed ${guessedNumber}`,
+          content: `<@${userId}> guessed ${guessedNumber}`,
         },
       });
-      
+
       return toReturn;
     }
-    
+
     if (name === "new_guessing_game") {
-      
     }
 
     // "challenge" guild command

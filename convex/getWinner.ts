@@ -1,7 +1,7 @@
 import { Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 
-export default query(async ({ db }): Promise<[string | null, string[], Map<string, number>]> => {
+export default query(async ({ db }): Promise<[string | null, string[], Map<string, [string, number]>]> => {
   const guesses = await db.table("guesses").collect();
   let tokenToGuess = new Map();
   let sum = 0;
@@ -16,7 +16,7 @@ export default query(async ({ db }): Promise<[string | null, string[], Map<strin
   for (let guess of guesses) {
     if (guess.messageToken) {
       messageTokens.push(guess.messageToken);
-      tokenToGuess.set(guess.messageToken, guess.guess);
+      tokenToGuess.set(guess.messageToken, [guess.guesser, guess.guess]);
     }
     
     const dist = Math.abs(guess.guess - avg);
