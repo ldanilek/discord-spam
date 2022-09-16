@@ -24,7 +24,6 @@ import { ConvexReactClient } from "convex/react";
 const url = "https://aware-spoonbill-23.convex.cloud";
 
 import ws from "ws";
-console.log(ws);
 
 
 const client = new ConvexReactClient({address: url}, {
@@ -35,9 +34,13 @@ const client = new ConvexReactClient({address: url}, {
 // now i need to actually write queries & mutations :P
 //client.subscribe("");
 
-async function onUpdate(query, args, onUpdate) {
+function onUpdate(query, args, cb) {
   const watch = client.watchQuery(query, ...args);
-  const cleanup = watch.onUpdate(() => onUpdate(watch.localQueryResult()));
+  const cleanup = watch.onUpdate(() => cb(watch.localQueryResult()));
+  console.log(`started watching query ${query}`);
+  for (let token of client.listeners) {
+    console.log(token[1]);
+  }
   return cleanup();
 }
 
