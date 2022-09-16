@@ -80,17 +80,22 @@ setTimeout(() => {
 function onUpdate(query, args, cb) {
   const watch = client.watchQuery(query, ...args);
   const cleanup = watch.onUpdate(() => cb(watch.localQueryResult()));
-  console.log(`started watching query ${query}`, client.listeners); 
-  return cleanup; 
+  // console.log(`started watching query ${query}`, client.listeners); 
+  return cleanup;
 }
-
+/*
 setTimeout(() => {
   const cleanup = onUpdate("getWinner", [], (value) => {
     console.log('got a Result!');
     console.log(value);
   });
 }, 500);
-
+*/
+const cleanup = onUpdate("getWinner", [], (value) => {
+    console.log('got a Result!');
+    console.log(value);
+  });
+ 
 const guessMutation = client.mutation("guess");
 
 //nonReactiveQuery('getSomething');
@@ -120,7 +125,16 @@ app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
 // Store for in-progress games. In production, you'd want to use a DB
 const activeGames = {};
 
-
+const notifyWinner = async (winner) => {
+  const endpoint = `webhooks/${process.env.APP_ID}/${req.body.token}/messages/${req.body.message.id}`;
+  await DiscordRequest(endpoint, {
+            method: "PATCH",
+            body: {
+              content: "Nice choice " + getRandomEmoji(),
+              components: [],
+            },
+          });
+};
 
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
