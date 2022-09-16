@@ -65,6 +65,18 @@ export const TEST_COMMAND = {
   type: 1,
 };
 
+export const GUESS_COMMAND = {
+  name: 'guess',
+  description: 'Guess the number',
+  options: [
+    {
+      type: 4,
+      name: 'number',
+      description: 'Guess a number between 0 and 100',
+    }
+  ]
+}
+
 // Command containing options
 export const CHALLENGE_COMMAND = {
   name: 'challenge',

@@ -9,6 +9,7 @@
  * @module
  */
 
+import type getWinner from "../getWinner";
 import type guess from "../guess";
 import type { OptimisticLocalStore as GenericOptimisticLocalStore } from "convex/browser";
 import type { ClientMutation, ClientQuery } from "convex/server";
@@ -23,7 +24,9 @@ import type { ClientMutation, ClientQuery } from "convex/server";
  * `ConvexReactClient` to create app-specific types.
  */
 export type ConvexAPI = {
-  queries: {};
+  queries: {
+    getWinner: ClientQuery<typeof getWinner>;
+  };
   mutations: {
     guess: ClientMutation<typeof guess>;
   };
