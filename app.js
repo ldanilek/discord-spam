@@ -41,7 +41,9 @@ async function onUpdate(query, args, onUpdate) {
   return cleanup();
 }
 
-const cleanup = onUpdate("getWinner", [], (value) => console.log(value));
+const cleanup = onUpdate("getWinner", [], (value) => {
+  console.log(value);
+});
 
 const guessMutation = client.mutation("guess");
 
@@ -110,14 +112,14 @@ app.post("/interactions", async function (req, res) {
     if (name === "guess") {
       const userId = req.body.member.user.id;
       const guessedNumber = req.body.data.options[0].value;
-      await guessMutation(guessedNumber, userId);
-      const winnerMsg = `<@{userId}> is winning`;
+      await guessMutation(guessedNumber, userId, id);
+      const winnerMsg = `<@${userId}> is winning`;
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-          content: `You have guessed ${guessedNumber}. <@${}`,
-        }
-      })
+          content: `You have guessed ${guessedNumber}. ${winnerMsg}`,
+        },
+      });
     }
 
     // "challenge" guild command
