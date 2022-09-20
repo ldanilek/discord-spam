@@ -77,6 +77,28 @@ export const GUESS_COMMAND = {
   ]
 };
 
+export const JOIN_TEAM_COMMAND = {
+  name: 'join_team',
+  description: 'Join a team of spammers',
+  options: [
+    {
+      type: 3,
+      name: 'team',
+    }
+  ]
+};
+
+export const SPAM_COMMAND = {
+  name: 'spam',
+  description: 'Join a team of spammers',
+  options: [
+    {
+      type: 3,
+      name: 'team',
+    }
+  ]
+};
+
 // Command containing options
 export const CHALLENGE_COMMAND = {
   name: 'challenge',

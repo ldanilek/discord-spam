@@ -124,7 +124,28 @@ app.post("/interactions", async function (req, res) {
     const { name } = data;
     
     if (name === "join_team") {
-      
+      const userId = req.body.member.user.id;
+      const team = req.body.data.options[0].value;
+      await joinMutation(userId, team);
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: `<@${userId}> joined spam team '${team}'`,
+        },
+      });
+    }
+    
+    if (name === "spam") {
+      const userId = req.body.member.user.id;
+      const message = req.body.data.options[0].value;
+      await spamMutation(userId, message);
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: `<@${userId}> sent spam`,
+          flags: InteractionResponseFlags.EPHEMERAL,
+        },
+      });
     }
 /*
     // "test" guild command
