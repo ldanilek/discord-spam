@@ -13,5 +13,9 @@ export default defineSchema({
   users: defineTable({
     user: s.string(),
     team: s.union(s.string(), s.null()),
+  }),
+  messages: defineTable({
+    reason: s.string(),
+    messageToken: s.string(),
   })
 });

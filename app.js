@@ -40,12 +40,13 @@ function onUpdate(query, args, cb) {
   // console.log(`started watching query ${query}`, client.listeners);
   return cleanup;
 }
-
+/*
 const cleanup = onUpdate("getWinner", [], (value) => {
   console.log("got a Result!");
   console.log(value);
   notifyWinner(value);
-});
+});*/
+
 
 //const guessMutation = client.mutation("guess");
 //const clearMutation = client.mutation("clear");
@@ -122,7 +123,7 @@ app.post("/interactions", async function (req, res) {
    */
   if (type === InteractionType.APPLICATION_COMMAND) {
     const { name } = data;
-    
+
     if (name === "join_team") {
       const userId = req.body.member.user.id;
       const team = req.body.data.options[0].value;
@@ -134,7 +135,7 @@ app.post("/interactions", async function (req, res) {
         },
       });
     }
-    
+
     if (name === "spam") {
       const userId = req.body.member.user.id;
       const message = req.body.data.options[0].value;
@@ -142,12 +143,12 @@ app.post("/interactions", async function (req, res) {
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-          content: `<@${userId}> sent spam`,
-          flags: InteractionResponseFlags.EPHEMERAL,
+          content: `<@${userId}>: ${message}`,
+          // flags: InteractionResponseFlags.EPHEMERAL,
         },
       });
     }
-/*
+    /*
     // "test" guild command
     if (name === "new_guessing_game") {
       // Send a message into the channel where command was triggered from
@@ -293,12 +294,38 @@ app.post("/interactions", async function (req, res) {
   }
 });
 
+
+export const JOIN_TEAM_COMMAND = {
+  name: "join_team",
+  description: "Join a team of spammers",
+  options: [
+    {
+      type: 3,
+      name: "team",
+      description: "team",
+    },
+  ],
+};
+
+// IDEA: emojis on a spam message are extra points
+export const SPAM_COMMAND = {
+  name: "spam",
+  description: "Send spam to keep your spam meter up",
+  options: [
+    {
+      type: 3,
+      name: "spam",
+      description: "spam",
+    },
+  ],
+};
+
 app.listen(PORT, () => {
   console.log("Listening on port", PORT);
 
   // Check if guild commands from commands.json are installed (if not, install them)
   HasGuildCommands(process.env.APP_ID, process.env.GUILD_ID, [
-    NEW_GUESSING_GAME_COMMAND,
-    GUESS_COMMAND,
+    JOIN_TEAM_COMMAND,
+    SPAM_COMMAND,
   ]);
 });
