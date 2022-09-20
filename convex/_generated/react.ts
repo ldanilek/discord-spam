@@ -11,8 +11,10 @@
 
 import type clear from "../clear";
 import type getLeaderboard from "../getLeaderboard";
+import type getMessages from "../getMessages";
 import type getWinner from "../getWinner";
 import type joinTeam from "../joinTeam";
+import type receiveMessage from "../receiveMessage";
 import type spam from "../spam";
 import type { OptimisticLocalStore as GenericOptimisticLocalStore } from "convex/browser";
 import type { ClientMutation, ClientQuery } from "convex/server";
@@ -29,11 +31,13 @@ import type { ClientMutation, ClientQuery } from "convex/server";
 export type ConvexAPI = {
   queries: {
     getLeaderboard: ClientQuery<typeof getLeaderboard>;
+    getMessages: ClientQuery<typeof getMessages>;
     getWinner: ClientQuery<typeof getWinner>;
   };
   mutations: {
     clear: ClientMutation<typeof clear>;
     joinTeam: ClientMutation<typeof joinTeam>;
+    receiveMessage: ClientMutation<typeof receiveMessage>;
     spam: ClientMutation<typeof spam>;
   };
 };
