@@ -33,51 +33,6 @@ const client = new ConvexReactClient(
     unsavedChangesWarning: false,
   }
 );
-/*
-const internalClient = new InternalConvexClient(
-      client.clientConfig,
-      updatedQueries => {
-        console.log('updated queries');
-        console.log(updatedQueries);
-        console.log(client.listeners);
-        for (const queryToken of updatedQueries) {
-          const callbacks = client.listeners.get(queryToken);
-          if (callbacks) {
-            for (const callback of callbacks) {
-              console.log("callback called");
-              callback();
-            }
-          }
-        }
-      },
-      client.options
-    );
-
-client.cachedSync = internalClient;
-internalClient.remoteQuerySet = null;
-const onOpen = internalClient.webSocketManager.onOpen;
-internalClient.webSocketManager["onOpen"] = () => {
-  console.log("websocket open");
-  onOpen();
-  console.log(internalClient.connectionCount);
-  const existingTransition = internalClient.remoteQuerySet.transition.bind(internalClient.remoteQuerySet);
-  internalClient.remoteQuerySet["transition"] = (t) => {
-    console.log(`transition: `, t);
-    existingTransition(t);
-  };
-};
-
-setTimeout(() => {
-  console.log("HI");
-  console.log(internalClient.connectionCount);
-  //internalClient.remoteQuerySet["transition"] = null;
-  console.log(internalClient.remoteQuerySet.transition);
-  const { modification, queryToken, unsubscribe } = internalClient.state.subscribe("getWinner", []);
-  internalClient.webSocketManager.sendMessage(modification);
-}, 1000);
-*/
-// now i need to actually write queries & mutations :P
-//client.subscribe("");
 
 function onUpdate(query, args, cb) {
   const watch = client.watchQuery(query, ...args);
@@ -85,14 +40,7 @@ function onUpdate(query, args, cb) {
   // console.log(`started watching query ${query}`, client.listeners);
   return cleanup;
 }
-/*
-setTimeout(() => {
-  const cleanup = onUpdate("getWinner", [], (value) => {
-    console.log('got a Result!');
-    console.log(value);
-  });
-}, 500);
-*/
+
 const cleanup = onUpdate("getWinner", [], (value) => {
   console.log("got a Result!");
   console.log(value);
