@@ -40,18 +40,30 @@ function onUpdate(query, args, cb) {
   // console.log(`started watching query ${query}`, client.listeners);
   return cleanup;
 }
-/*
-const cleanup = onUpdate("getWinner", [], (value) => {
-  console.log("got a Result!");
-  console.log(value);
-  notifyWinner(value);
-});*/
+
+let leaderboardMessageTokens = [];
+let leaderboard = [];
+
+onUpdate("getLeaderboard", [], (value) => {
+  leaderboard = value;
+  console.log("leaderboard changed");
+});
+
+onUpdate("getMessages", ["leaderboard"], (value) => {
+  leaderboardMessageTokens = value;
+  console.log("leaderboard messages changed");
+})
+
+const updateLeaderboard = () => {
+  
+};
 
 
 //const guessMutation = client.mutation("guess");
 //const clearMutation = client.mutation("clear");
 const joinMutation = client.mutation("joinTeam");
 const spamMutation = client.mutation("spam");
+const messageMutation = client.mutation("receiveMessage");
 
 //nonReactiveQuery('getSomething');
 
@@ -76,7 +88,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 // Parse request body and verifies incoming requests using discord-interactions package
 app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
-
+/*
 // Store for in-progress games. In production, you'd want to use a DB
 const activeGames = {};
 
@@ -101,7 +113,7 @@ const notifyWinner = async (winner) => {
       console.log(e);
     }
   }
-};
+};*/
 
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
@@ -127,6 +139,7 @@ app.post("/interactions", async function (req, res) {
     if (name === "join_team") {
       const userId = req.body.member.user.id;
       const team = req.body.data.options[0].value;
+      await messageMutation("join team", req.body.token);
       await joinMutation(userId, team);
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -139,12 +152,23 @@ app.post("/interactions", async function (req, res) {
     if (name === "spam") {
       const userId = req.body.member.user.id;
       const message = req.body.data.options[0].value;
+      await messageMutation("spam", req.body.token);
       await spamMutation(userId, message);
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           content: `<@${userId}>: ${message}`,
           // flags: InteractionResponseFlags.EPHEMERAL,
+        },
+      });
+    }
+    
+    if (name === "leaderboard") {
+      await messageMutation("leaderboard", req.body.token);
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: `Loading leaderboard...`,
         },
       });
     }
@@ -318,6 +342,12 @@ export const SPAM_COMMAND = {
       description: "spam",
     },
   ],
+};
+
+export const LEADERBOARD_COMMAND = {
+  name: "leaderboard",
+  description: "See who's winning the spam war",
+  options: [],
 };
 
 app.listen(PORT, () => {
