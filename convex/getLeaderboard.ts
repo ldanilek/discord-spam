@@ -7,31 +7,25 @@ export default query(async ({ db }): Promise<string[]> => {
   let userToAttribution = new Map();
   for (let userDoc of userDocs) {
     if (userDoc.team) {
-      userToAttribution.set(userDoc.user, `Team ${}`)
-    }
-    
-  }
-  let tokenToGuess = new Map();
-  let sum = 0;
-  for (let guess of guesses) {
-    sum += guess.guess;
-  }
-  let avg = sum / guesses.length;
-  let target = avg * 0.5;
-  let closestDist = 100;
-  let closestGuesser = null;
-  let messageTokens = [];
-  for (let guess of guesses) {
-    if (guess.messageToken) {
-      messageTokens.push(guess.messageToken);
-      tokenToGuess.set(guess.messageToken, [guess.guesser, guess.guess]);
-    }
-    
-    const dist = Math.abs(guess.guess - avg);
-    if (dist < closestDist) {
-      closestDist = dist;
-      closestGuesser = guess.guesser;
+      userToAttribution.set(userDoc.user, `Team ${userDoc.team}`);
+    } else {
+      userToAttribution.set(userDoc.user, `<@${userDoc.user}>`);
     }
   }
-  return [closestGuesser, messageTokens, tokenToGuess];
+  let attributionCounts = new Map();
+  for (let spamDoc of spamDocs) {
+    const attribution = userToAttribution.get(spamDoc.user);
+    const currentCount = attributionCounts.get(attribution);
+    if (!currentCount) {
+      attributionCounts.set(attribution, 1);
+    } else {
+      attributionCounts.set(attribution, currentCount + 1);
+    }
+  }
+  let leaderboardTuples = [];
+  for (let attribution of attributionCounts.keys()) {
+    leaderboardTuples.push([attribution, attributionCounts.get(attribution)]);
+  }
+  leaderboardTuples.sort((a, b) => a[1] - b[1]);
+  return leaderboardTuples.map(a => a[0]);
 });

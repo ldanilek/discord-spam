@@ -6,12 +6,12 @@ export default defineSchema({
     guesser: s.string(),
     messageToken: s.string(),
   }),
-  spam: defineSchema({
+  spam: defineTable({
     message: s.string(),
     user: s.string(),
   }),
-  users: defineSchema({
+  users: defineTable({
     user: s.string(),
-    team: s.string() | null,
+    team: s.union(s.string(), s.null()),
   })
 });

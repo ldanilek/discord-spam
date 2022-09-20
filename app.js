@@ -47,8 +47,10 @@ const cleanup = onUpdate("getWinner", [], (value) => {
   notifyWinner(value);
 });
 
-const guessMutation = client.mutation("guess");
-const clearMutation = client.mutation("clear");
+//const guessMutation = client.mutation("guess");
+//const clearMutation = client.mutation("clear");
+const joinMutation = client.mutation("joinTeam");
+const spamMutation = client.mutation("spam");
 
 //nonReactiveQuery('getSomething');
 
@@ -120,7 +122,11 @@ app.post("/interactions", async function (req, res) {
    */
   if (type === InteractionType.APPLICATION_COMMAND) {
     const { name } = data;
-
+    
+    if (name === "join_team") {
+      
+    }
+/*
     // "test" guild command
     if (name === "new_guessing_game") {
       // Send a message into the channel where command was triggered from
@@ -262,6 +268,7 @@ app.post("/interactions", async function (req, res) {
         }
       }
     }
+    */
   }
 });
 
